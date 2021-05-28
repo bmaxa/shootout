@@ -1003,18 +1003,18 @@ saturn body
 uranus body
 neptune body
 align 16
-bodyx rq 64
-bodyy rq 64
-bodyz rq 64
-bodyvx rq 64
-bodyvy rq 64
-bodyvz rq 64
-bodymass rq 64
+bodyx rq 5
+bodyy rq 5
+bodyz rq 5
+bodyvx rq 5
+bodyvy rq 5
+bodyvz rq 5
+bodymass rq 5
 bodyindex rq 1
-diffx rq 64
-diffy rq 64
-diffz rq 64
-n rq 1
+diffx rq 10
+diffy rq 10
+diffz rq 10
 align 16
-mag rq 64
-rr rq 64
+mag rq 10
+rr rq 10
+n rq 1
