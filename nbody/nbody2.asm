@@ -137,9 +137,9 @@ else
 ;  scatterq rsi+r.dy,xmm6,1,xmm1
 ;  scatterq rsi+r.dz,xmm6,1,xmm2
   end if
-  vmovupd yword[rdi + diffx],ymm0
-  vmovupd yword[rdi + diffy],ymm1
-  vmovupd yword[rdi + diffz],ymm2
+  vmovapd yword[rdi + diffx],ymm0
+  vmovapd yword[rdi + diffy],ymm1
+  vmovapd yword[rdi + diffz],ymm2
   add rbx,8
   add rsi,32
   add rdi,32
@@ -286,9 +286,9 @@ else
 	mov rdi,mag
 .L2:
 
-	vmovupd ymm3,yword[rsi+diffx]
-	vmovupd ymm4,yword[rsi+diffy]
-	vmovupd ymm5,yword[rsi+diffz]
+	vmovapd ymm3,yword[rsi+diffx]
+	vmovapd ymm4,yword[rsi+diffy]
+	vmovapd ymm5,yword[rsi+diffz]
 
 	vbroadcastsd ymm6,xmm15
 
@@ -308,7 +308,7 @@ else
 	;--------------------------
 
 
-	vmovupd yword[rdi],ymm6
+	vmovapd yword[rdi],ymm6
 	add rdi,32
 	add rsi,32
 	dec ecx
@@ -393,9 +393,9 @@ else
 	vmovupd ymm5, yword[rdi]
 	vmulpd ymm6,ymm6, ymm5 ; precompute bodies[j].mass * mag
 
-	vmovupd ymm10,yword[rsi+diffx]
-	vmovupd ymm11,yword[rsi+diffy]
-	vmovupd ymm12,yword[rsi+diffz]
+	vmovapd ymm10,yword[rsi+diffx]
+	vmovapd ymm11,yword[rsi+diffy]
+	vmovapd ymm12,yword[rsi+diffz]
 
 	vmovsd xmm3, [r11 + bodyvx]
 	vmovsd xmm4, [r11 + bodyvy]
@@ -653,6 +653,45 @@ else
  ;.L5:
  ; cmp ecx,1
  ; jnz @f
+	;jmp .kskip1
+  ;@@:
+	vmovapd ymm0, yword[r9 + bodyx]
+	vmovapd ymm1, yword[r9 + bodyy]
+	vmovapd ymm2, yword[r9 + bodyz]
+
+	vbroadcastsd ymm3, xmm15
+	vmovapd ymm4,ymm3
+  vmovapd ymm5,ymm3
+
+  vmovapd ymm6, yword[r9 + bodyvx]
+	vmovapd ymm7, yword[r9 + bodyvy]
+	vmovapd ymm8, yword[r9 + bodyvz]
+
+	;vmulpd ymm3,ymm3,ymm6
+	;vmulpd ymm4,ymm4,ymm7
+	;vmulpd ymm5,ymm5,ymm8
+	;vaddpd ymm0,ymm0,ymm3
+	;vaddpd ymm1,ymm1,ymm4
+	;vaddpd ymm2,ymm2,ymm5
+
+	vfmadd231pd ymm0,ymm3,ymm6
+	vfmadd231pd ymm1,ymm4,ymm7
+	vfmadd231pd ymm2,ymm5,ymm8
+	;movlpd [rbx + oBody.x], xmm0
+	;movlpd [rbx + oBody.y], xmm1
+	;movlpd [rbx + oBody.z], xmm2
+	;movhpd [rbx + oBody.x + SIZEOFBODY], xmm0
+	;movhpd [rbx + oBody.y + SIZEOFBODY], xmm1
+	;movhpd [rbx + oBody.z + SIZEOFBODY], xmm2
+  vmovapd yword[r9+bodyx],ymm0
+  vmovapd yword[r9+bodyy],ymm1
+  vmovapd yword[r9+bodyz],ymm2
+
+	;add rbx,4*SIZEOFBODY
+  add r9,32
+  ;.kskip1:
+	;jg .L5
+	vzeroupper
 	vmovsd xmm0, [r9 + bodyx]
 	vmovsd xmm1, [r9 + bodyy]
 	vmovsd xmm2, [r9 + bodyz]
@@ -682,48 +721,9 @@ else
   vmovsd [r9+bodyy],xmm1
   vmovsd [r9+bodyz],xmm2
 
-	add rbx,SIZEOFBODY
-  add r9,8
-	dec ecx
-	;jmp .kskip1
-  ;@@:
-	vmovupd ymm0, yword[r9 + bodyx]
-	vmovupd ymm1, yword[r9 + bodyy]
-	vmovupd ymm2, yword[r9 + bodyz]
-
-	vbroadcastsd ymm3, xmm15
-	vmovapd ymm4,ymm3
-  vmovapd ymm5,ymm3
-
-  vmovupd ymm6, yword[r9 + bodyvx]
-	vmovupd ymm7, yword[r9 + bodyvy]
-	vmovupd ymm8, yword[r9 + bodyvz]
-
-	;vmulpd ymm3,ymm3,ymm6
-	;vmulpd ymm4,ymm4,ymm7
-	;vmulpd ymm5,ymm5,ymm8
-	;vaddpd ymm0,ymm0,ymm3
-	;vaddpd ymm1,ymm1,ymm4
-	;vaddpd ymm2,ymm2,ymm5
-
-	vfmadd231pd ymm0,ymm3,ymm6
-	vfmadd231pd ymm1,ymm4,ymm7
-	vfmadd231pd ymm2,ymm5,ymm8
-	;movlpd [rbx + oBody.x], xmm0
-	;movlpd [rbx + oBody.y], xmm1
-	;movlpd [rbx + oBody.z], xmm2
-	;movhpd [rbx + oBody.x + SIZEOFBODY], xmm0
-	;movhpd [rbx + oBody.y + SIZEOFBODY], xmm1
-	;movhpd [rbx + oBody.z + SIZEOFBODY], xmm2
-  vmovupd yword[r9+bodyx],ymm0
-  vmovupd yword[r9+bodyy],ymm1
-  vmovupd yword[r9+bodyz],ymm2
-
-	;add rbx,4*SIZEOFBODY
-  ;add r9,32
-  ;.kskip1:
-	;jg .L5
-	vzeroupper
+	;add rbx,SIZEOFBODY
+  ;add r9,8
+	;dec ecx
 end if
 }
 
@@ -992,25 +992,35 @@ L1 dq 2 dup(1.5)
 L2 dq 2 dup(0.5)
 indexdiff dq 0,SIZEOFDIFF
 mask dq 2 dup(-1)
-section '.bss' writeable align 16
+section '.bss' writeable align 32
 sun body
 jupiter body
 saturn body
 uranus body
 neptune body
-align 16
+align 32
 bodyx rq 5
+align 32
 bodyy rq 5
+align 32
 bodyz rq 5
+align 32
 bodyvx rq 5
+align 32
 bodyvy rq 5
+align 32
 bodyvz rq 5
+align 32
 bodymass rq 5
+align 32
 bodyindex rq 1
+align 32
 diffx rq 10
+align 32
 diffy rq 10
+align 32
 diffz rq 10
-align 16
+align 32
 mag rq 10
 rr rq 10
 n rq 1
