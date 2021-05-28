@@ -212,7 +212,7 @@ else
 	add rbx,8
 	dec ecx
 	jnz .L0
-	vzeroupper
+
 end if
 ;-----------------------------------
 if 0
@@ -313,7 +313,7 @@ else
 	add rsi,32
 	dec ecx
 	jnz .L2
-  vzeroupper
+
 end if
 ;-----------------------------------------------
 if 0
@@ -691,7 +691,7 @@ else
   add r9,32
   ;.kskip1:
 	;jg .L5
-	vzeroupper
+
 	vmovsd xmm0, [r9 + bodyx]
 	vmovsd xmm1, [r9 + bodyy]
 	vmovsd xmm2, [r9 + bodyz]
