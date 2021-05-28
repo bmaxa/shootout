@@ -390,7 +390,7 @@ else
 	lea rdx, [rbx+SIZEOFBODY]
   lea r10, [r11+8]
 	vmovupd ymm6, yword[r10 + bodymass]
-	vmovupd ymm5, yword[rdi]
+	vmovapd ymm5, yword[rdi]
 	vmulpd ymm6,ymm6, ymm5 ; precompute bodies[j].mass * mag
 
 	vmovapd ymm10,yword[rsi+diffx]
@@ -429,7 +429,7 @@ else
 	; iBody.vx -= dx * bodies[j].mass * mag;
 ; ----------------------------------------------
 	vbroadcastsd ymm7, [r11 + bodymass]
-	vmovupd ymm6, yword[rdi]
+	vmovapd ymm6, yword[rdi]
 	vmulpd ymm7,ymm7,ymm6 ; precompute iBody.mass * mag
 
 	vmovupd ymm3, yword[r10 + bodyvx]
