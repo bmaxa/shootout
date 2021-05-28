@@ -741,10 +741,6 @@ main:
 	mov rdi,qword[rsi+8] ; argv[1] -> rdi
 	call plt atoi
 	mov qword[n],rax
-  mov rdi,bodyx
-  mov ecx,7*80
-  mov al,0
-  rep stosb
 	mov eax,0
 	mov rdi, argv
 	mov rsi,[n]
