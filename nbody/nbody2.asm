@@ -293,11 +293,13 @@ else
 	vbroadcastsd ymm6,xmm15
 
 	vmulpd ymm3,ymm3,ymm3
-	vmulpd ymm4,ymm4,ymm4
-	vmulpd ymm5,ymm5,ymm5
+	;vmulpd ymm4,ymm4,ymm4
+	;vmulpd ymm5,ymm5,ymm5
 
-	vaddpd ymm3,ymm3,ymm4
-	vaddpd ymm3,ymm3,ymm5 ; dsquared -> xmm3
+	;vaddpd ymm3,ymm3,ymm4
+	;vaddpd ymm3,ymm3,ymm5 ; dsquared -> xmm3
+  vfmadd231pd ymm3,ymm4,ymm4
+  vfmadd231pd ymm3,ymm5,ymm5
 
   vsqrtpd ymm7,ymm3
   vmulpd ymm3,ymm3,ymm7
