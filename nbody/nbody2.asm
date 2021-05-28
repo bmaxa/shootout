@@ -437,12 +437,15 @@ else
 	vmovapd ymm0, ymm10
 	vmovapd ymm1, ymm11
 	vmovapd ymm2, ymm12
-	vmulpd ymm0,ymm0, ymm7
-	vmulpd ymm1,ymm1, ymm7
-	vmulpd ymm2,ymm2, ymm7
-	vaddpd ymm3,ymm3, ymm0
-	vaddpd ymm4,ymm4, ymm1
-	vaddpd ymm5,ymm5, ymm2
+	;vmulpd ymm0,ymm0, ymm7
+	;vmulpd ymm1,ymm1, ymm7
+	;vmulpd ymm2,ymm2, ymm7
+	;vaddpd ymm3,ymm3, ymm0
+	;vaddpd ymm4,ymm4, ymm1
+	;vaddpd ymm5,ymm5, ymm2
+	vfmadd231pd ymm3,ymm0,ymm7
+	vfmadd231pd ymm4,ymm1,ymm7
+	vfmadd231pd ymm5,ymm2,ymm7
 
 	;movlpd [rdx + oBody.vx], xmm3
 	;movlpd [rdx + oBody.vy], xmm4
@@ -493,7 +496,6 @@ else
 	vsubsd xmm3,xmm3,xmm7
 	vsubsd xmm4,xmm4,xmm8
 	vsubsd xmm5,xmm5,xmm9
-
 	;movsd [rbx + oBody.vx],xmm3
 	;movsd [rbx + oBody.vy],xmm4
 	;movsd [rbx + oBody.vz],xmm5
@@ -513,13 +515,15 @@ else
 	vmovapd xmm0, xmm10
 	vmovapd xmm1, xmm11
 	vmovapd xmm2, xmm12
-	vmulpd xmm0,xmm0, xmm7
-	vmulpd xmm1,xmm1, xmm7
-	vmulpd xmm2,xmm2, xmm7
-	vaddpd xmm3,xmm3, xmm0
-	vaddpd xmm4,xmm4, xmm1
-	vaddpd xmm5,xmm5, xmm2
-
+	;vmulpd xmm0,xmm0, xmm7
+	;vmulpd xmm1,xmm1, xmm7
+	;vmulpd xmm2,xmm2, xmm7
+	;vaddpd xmm3,xmm3, xmm0
+	;vaddpd xmm4,xmm4, xmm1
+	;vaddpd xmm5,xmm5, xmm2
+  vfmadd231pd xmm3,xmm0,xmm7
+  vfmadd231pd xmm4,xmm1,xmm7
+  vfmadd231pd xmm5,xmm2,xmm7
 	;movlpd [rdx + oBody.vx], xmm3
 	;movlpd [rdx + oBody.vy], xmm4
 	;movlpd [rdx + oBody.vz], xmm5
@@ -553,12 +557,15 @@ else
 	vmovsd xmm7,xmm7, xmm10
 	vmovsd xmm8,xmm8, xmm11
 	vmovsd xmm9,xmm9, xmm12
-	vmulsd xmm7,xmm7, xmm6
-	vmulsd xmm8,xmm8, xmm6
-	vmulsd xmm9,xmm9, xmm6
-	vsubsd xmm3,xmm3,xmm7
-	vsubsd xmm4,xmm4,xmm8
-	vsubsd xmm5,xmm5,xmm9
+	;vmulsd xmm7,xmm7, xmm6
+	;vmulsd xmm8,xmm8, xmm6
+	;vmulsd xmm9,xmm9, xmm6
+	;vsubsd xmm3,xmm3,xmm7
+	;vsubsd xmm4,xmm4,xmm8
+	;vsubsd xmm5,xmm5,xmm9
+	vfnmadd231pd xmm3,xmm7,xmm6
+	vfnmadd231pd xmm4,xmm8,xmm6
+	vfnmadd231pd xmm5,xmm9,xmm6
 
 	;movsd [rbx + oBody.vx],xmm3
 	;movsd [rbx + oBody.vy],xmm4
@@ -579,12 +586,15 @@ else
 	vmovsd xmm0,xmm0, xmm10
 	vmovsd xmm1,xmm1, xmm11
 	vmovsd xmm2,xmm2, xmm12
-	vmulsd xmm0,xmm0, xmm7
-	vmulsd xmm1,xmm1, xmm7
-	vmulsd xmm2,xmm2, xmm7
-	vaddsd xmm3,xmm3, xmm0
-	vaddsd xmm4,xmm4, xmm1
-	vaddsd xmm5,xmm5, xmm2
+	;vmulsd xmm0,xmm0, xmm7
+	;vmulsd xmm1,xmm1, xmm7
+	;vmulsd xmm2,xmm2, xmm7
+	;vaddsd xmm3,xmm3, xmm0
+	;vaddsd xmm4,xmm4, xmm1
+	;vaddsd xmm5,xmm5, xmm2i
+	vfmadd231pd xmm3,xmm0,xmm7
+	vfmadd231pd xmm4,xmm1,xmm7
+	vfmadd231pd xmm5,xmm2,xmm7
 
 	;movsd [rdx + oBody.vx], xmm3
 	;movsd [rdx + oBody.vy], xmm4
@@ -653,12 +663,15 @@ else
 	vmovsd xmm7, [r9 + bodyvy]
 	vmovsd xmm8, [r9 + bodyvz]
 
-	vmulsd xmm3,xmm3,xmm6
-	vmulsd xmm4,xmm4,xmm7
-	vmulsd xmm5,xmm5,xmm8
-	vaddsd xmm0,xmm0,xmm3
-	vaddsd xmm1,xmm1,xmm4
-	vaddsd xmm2,xmm2,xmm5
+	;vmulsd xmm3,xmm3,xmm6
+	;vmulsd xmm4,xmm4,xmm7
+	;vmulsd xmm5,xmm5,xmm8
+	;vaddsd xmm0,xmm0,xmm3
+	;vaddsd xmm1,xmm1,xmm4
+	;vaddsd xmm2,xmm2,xmm5
+  vfmadd231pd xmm0,xmm3,xmm6
+  vfmadd231pd xmm1,xmm4,xmm7
+  vfmadd231pd xmm2,xmm5,xmm8
 
 	;movsd [rbx + oBody.x], xmm0
 	;movsd [rbx + oBody.y], xmm1
@@ -684,13 +697,16 @@ else
 	vmovupd ymm7, yword[r9 + bodyvy]
 	vmovupd ymm8, yword[r9 + bodyvz]
 
-	vmulpd ymm3,ymm3,ymm6
-	vmulpd ymm4,ymm4,ymm7
-	vmulpd ymm5,ymm5,ymm8
-	vaddpd ymm0,ymm0,ymm3
-	vaddpd ymm1,ymm1,ymm4
-	vaddpd ymm2,ymm2,ymm5
+	;vmulpd ymm3,ymm3,ymm6
+	;vmulpd ymm4,ymm4,ymm7
+	;vmulpd ymm5,ymm5,ymm8
+	;vaddpd ymm0,ymm0,ymm3
+	;vaddpd ymm1,ymm1,ymm4
+	;vaddpd ymm2,ymm2,ymm5
 
+	vfmadd231pd ymm0,ymm3,ymm6
+	vfmadd231pd ymm1,ymm4,ymm7
+	vfmadd231pd ymm2,ymm5,ymm8
 	;movlpd [rbx + oBody.x], xmm0
 	;movlpd [rbx + oBody.y], xmm1
 	;movlpd [rbx + oBody.z], xmm2
