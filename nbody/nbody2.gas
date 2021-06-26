@@ -1,0 +1,750 @@
+SIZEOFBODY = 64
+PI = 0x400921FB54442D18;3.141592653589793;
+DAYS_PER_YEAR = 0x4076D3D70A3D70A4;365.24;
+SOLAR_MASS = 0x4043bd3cc9be45de ; 4 * PI * PI
+.set diff.dx,0
+.set diff.dy,8
+.set diff.dz,16
+.set body.x,0
+.set body.y,8
+.set body.z,16
+.set body.vx,24
+.set body.vy,32
+.set body.vz,40
+.set body.mass,48
+
+.macro init_body b, x,y,z,vx,vy,vz,mass,index
+    ldr x0,=\x
+    fmov d0,x0
+    ldr x0,=\y
+    fmov d1,x0
+    ldr x0,=\z
+    fmov d2,x0
+
+    adrp x2,bodyx@PAGE
+    add x2,x2,bodyx@PAGEOFF
+    adrp x3,bodyy@PAGE
+    add x3,x3,bodyy@PAGEOFF
+    adrp x4,bodyz@PAGE
+    add x4,x4,bodyz@PAGEOFF
+
+    mov x1,\index
+    adrp x0,\b@PAGE
+    add x0,x0,\b@PAGEOFF
+
+    str d0,[x0,body.x]
+    str d1,[x0,body.y]
+    str d2,[x0,body.z]
+    str d0,[x2,x1, lsl 3]
+    str d1,[x3,x1, lsl 3]
+    str d2,[x4,x1, lsl 3]
+    adrp x2,bodyvx@PAGE
+    add x2,x2,bodyvx@PAGEOFF
+    adrp x3,bodyvy@PAGE
+    add x3,x3,bodyvy@PAGEOFF
+    adrp x4,bodyvz@PAGE
+    add x4,x4,bodyvz@PAGEOFF
+    ldr x0,=DAYS_PER_YEAR
+    fmov d0,x0
+    ldr x0,=\vx
+    fmov d1,x0
+    ldr x0,=\vy
+    fmov d2,x0
+    ldr x0,=\vz
+    fmov d3,x0
+    fmul d1,d1,d0
+    fmul d2,d2,d0
+    fmul d3,d3,d0
+    adrp x0,\b@PAGE
+    add x0,x0,\b@PAGEOFF
+    str d1,[x0,body.vx]
+    str d2,[x0,body.vy]
+    str d3,[x0,body.vz]
+    str d1,[x2,x1, lsl 3]
+    str d2,[x3,x1, lsl 3]
+    str d3,[x4,x1, lsl 3]
+    ldr x0,=SOLAR_MASS
+    fmov d0,x0
+    ldr x0,=\mass
+    fmov d1,x0
+    fmul d1,d1,d0
+    adrp x0,\b@PAGE
+    add x0,x0,\b@PAGEOFF
+    adrp x2,bodymass@PAGE
+    add x2,x2,bodymass@PAGEOFF
+    str d1,[x0,body.mass]
+    str d1,[x2,x1, lsl 3]
+.endm
+
+    .text
+    .align 4
+    .global _main
+
+_main:
+    str x30,[sp,-16]!
+    mov x8,1
+    adrp x9,n@PAGE
+    str x8,[x9,n@PAGEOFF]
+
+	; x0 - > argc , x1 -> argv
+    cmp x0,2
+	blt .begin
+
+    ldr x0,[x1,8]
+	bl _atoi
+    adrp x9,n@PAGE
+    str x0,[x9,n@PAGEOFF]
+    mov x8,x0
+    adrp x0,argv@PAGE
+    add x0,x0,argv@PAGEOFF
+	sub sp,sp,16
+    str x8,[sp]
+	bl _printf
+	add sp,sp,16
+.begin:
+;-------------    
+    ;init_body sun,0.0,0.0,0.0,0.0,0.0,0.0,1.0
+    init_body sun,0,0,0,0,0,0,0x3FF0000000000000, 0 
+    adrp x1,sun@PAGE
+    add x1,x1,sun@PAGEOFF
+	
+    ;init_body jupiter,4.84143144246472090e+00, -1.16032004402742839e+00, -1.03622044471123109e-01, 1.66007664274403694e-03, 7.69901118419740425e-03, -6.90460016972063023e-05, 9.54791938424326609e-04
+	init_body jupiter,0x40135DA0343CD92C, 0xBFF290ABC01FDB7C, 0xBFBA86F96C25EBF0, 0x3F5B32DDB8EC9209, 0x3F7F88FF93F670B6, 0xBF12199946DEBD80,0x3F4F49601333C135, 1
+    adrp x1,jupiter@PAGE
+    add x1,x1,jupiter@PAGEOFF
+	;init_body saturn,8.34336671824457987e+00, 4.12479856412430479e+00, -4.03523417114321381e-01, -2.76742510726862411e-03, 4.99852801234917238e-03, 2.30417297573763929e-05,  2.85885980666130812e-04;
+	init_body saturn, 0x4020afcdc332ca67,0x40107fcb31de01b0,0xbfd9d353e1eb467c,0xbf66abb60a8e1d76,0x3f747956257578b8,0x3ef829379cad4ac0,0x3f32bc5eeff5e6f8, 2
+    adrp x1,saturn@PAGE
+    add x1,x1,saturn@PAGEOFF
+
+	;init_body uranus,1.28943695621391310e+01, -1.51111514016986312e+01, -2.23307578892655734e-01, 2.96460137564761618e-03, 2.37847173959480950e-03, -2.96589568540237556e-05, 4.36624404335156298e-05
+	init_body uranus,0x4029c9eacea7d9cf,0xc02e38e8d626667e,0xbfcc9557be257da0,0x3f6849383e87d954,0x3f637c044ac0ace1,0xbeff1983fedbfaa0,0x3f06e44607a13bd6, 3
+    adrp x1,uranus@PAGE
+    add x1,x1,uranus@PAGEOFF
+
+	;init_body neptune,1.53796971148509165e+01, -2.59193146099879641e+01, 1.79258772950371181e-01, 2.68067772490389322e-03, 1.62824170038242295e-03, -9.51592254519715870e-05, 5.15138902046611451e-05;
+	init_body neptune,0x402ec267a905572a,0xc039eb5833c8a220,0x3fc6f1f393abe540,0x3f65f5c9e51b4320,0x3f5aad5736999d88,0xbf18f2070b7f9750,0x3f0b0213ca2d0eec, 4
+    adrp x1,neptune@PAGE
+    add x1,x1,neptune@PAGEOFF
+    mov x0,xzr
+    fmov d0,x0
+    fmov d1,x0
+    fmov d2,x0
+
+    adrp x1,sun@PAGE
+    add x1,x1,sun@PAGEOFF
+    mov x2,5
+; init
+; ----------------------------------
+.L0main:
+    ldr d3,[x1,body.vx]
+    ldr d4,[x1,body.mass]
+    fmul d3,d3,d4
+    fadd d0,d0,d3
+
+    ldr d3,[x1,body.vy]
+    ldr d4,[x1,body.mass]
+    fmul d3,d3,d4
+    fadd d1,d1,d3
+
+    ldr d3,[x1,body.vz]
+    ldr d4,[x1,body.mass]
+    fmul d3,d3,d4
+    fadd d2,d2,d3
+
+    add x1,x1,SIZEOFBODY
+    subs x2,x2,1
+    bgt .L0main
+
+    adrp x1,sun@PAGE
+    add x1,x1,sun@PAGEOFF
+    mov x0,xzr
+	bl offset_momentum
+; ----------------------------------------
+	bl energy
+    fmov x21,d0
+    adrp x20,n@PAGE
+    ldr x20,[x20,n@PAGEOFF]
+	ldr x0,=0x3F847AE147AE147B;0.01
+	dup.2d v15,x0
+.L1main:
+	bl advance
+    subs x20,x20,1
+	bgt .L1main
+
+	bl energy
+    fmov x22,d0
+    adrp x1,sun@PAGE
+    add x1,x1,sun@PAGEOFF
+    mov x0,xzr
+	bl print_body
+    adrp x1,jupiter@PAGE
+    add x1,x1,jupiter@PAGEOFF
+    mov x0,1
+	bl print_body
+    adrp x1,saturn@PAGE
+    add x1,x1,saturn@PAGEOFF
+    mov x0,2
+	bl print_body
+    adrp x1,uranus@PAGE
+    add x1,x1,uranus@PAGEOFF
+    mov x0,3
+	bl print_body
+    adrp x1,neptune@PAGE
+    add x1,x1,neptune@PAGEOFF
+    mov x0,4
+	bl print_body
+    fmov d0,x21
+	bl print_energy
+    fmov d0,x22
+	bl print_energy
+    ldr x30,[sp],16
+    ret
+; px d0 , py d1 , pz d2, x1 body , x0 index
+offset_momentum:
+    mov x9,x0
+	ldr x0,=0x8000000000000000
+    fmov x8,d0
+    eor x8,x8,x0
+    fmov d0,x8
+    fmov x8,d1
+    eor x8,x8,x0
+    fmov d1,x8
+    fmov x8,d2
+    eor x8,x8,x0
+    fmov d2,x8
+    ldr x0,=SOLAR_MASS
+    fmov d3,x0
+    fdiv d0,d0,d3
+    fdiv d1,d1,d3
+    fdiv d2,d2,d3
+    str d0,[x1,body.vx]
+    str d1,[x1,body.vy]
+    str d2,[x1,body.vz]
+    adrp x10,bodyvx@PAGE
+    add x10,x10,bodyvx@PAGEOFF
+    adrp x11,bodyvy@PAGE
+    add x11,x11,bodyvy@PAGEOFF
+    adrp x12,bodyvz@PAGE
+    add x12,x12,bodyvz@PAGEOFF
+    str d0,[x10,x9,lsl 3]
+    str d1,[x11,x9,lsl 3]
+    str d2,[x12,x9,lsl 3]
+	ret
+
+print_body:
+    sub sp,sp,16
+	stp x19,x30,[sp],-128
+    mov x19,x0
+
+	adrp x0,bmsg@PAGE
+    add x0,x0,bmsg@PAGEOFF
+	ldr d0,[x1,body.x]
+	ldr d1,[x1,body.y]
+	ldr d2,[x1,body.z]
+	ldr d3,[x1,body.vx]
+	ldr d4,[x1,body.vy]
+	ldr d5,[x1,body.vz]
+	ldr d6,[x1,body.mass]
+    str d0,[sp]
+    str d1,[sp,8]
+    str d2,[sp,16]
+    str d3,[sp,24]
+    str d4,[sp,32]
+    str d5,[sp,40]
+    str d6,[sp,48]
+	bl _printf
+    adrp x9,bodyx@PAGE
+    add x9,x9,bodyx@PAGEOFF
+    adrp x10,bodyy@PAGE
+    add x10,x10,bodyy@PAGEOFF
+    adrp x11,bodyz@PAGE
+    add x11,x11,bodyz@PAGEOFF
+    adrp x12,bodyvx@PAGE
+    add x12,x12,bodyvx@PAGEOFF
+    adrp x13,bodyvy@PAGE
+    add x13,x13,bodyvy@PAGEOFF
+    adrp x14,bodyvz@PAGE
+    add x14,x14,bodyvz@PAGEOFF
+    adrp x15,bodymass@PAGE
+    add x15,x15,bodymass@PAGEOFF
+	adrp x0,bmsg@PAGE
+    add x0,x0,bmsg@PAGEOFF
+	ldr d0,[x9,x19, lsl 3]
+	ldr d1,[x10,x19, lsl 3]
+	ldr d2,[x11,x19, lsl 3]
+	ldr d3,[x12,x19, lsl 3]
+	ldr d4,[x13,x19, lsl 3]
+	ldr d5,[x14,x19, lsl 3]
+	ldr d6,[x15,x19, lsl 3]
+    str d0,[sp]
+    str d1,[sp,8]
+    str d2,[sp,16]
+    str d3,[sp,24]
+    str d4,[sp,32]
+    str d5,[sp,40]
+    str d6,[sp,48]
+	bl _printf
+    ldp x19,x30,[sp,128]!
+    add sp,sp,16
+	ret
+; d0 resulting energy
+energy:
+    mov x1,xzr
+    mov x2,5
+    movi.2d v0,0
+    adrp x8,bodyvx@PAGE
+    add x8,x8,bodyvx@PAGEOFF
+    adrp x9,bodyvy@PAGE
+    add x9,x9,bodyvy@PAGEOFF
+    adrp x10,bodyvz@PAGE
+    add x10,x10,bodyvz@PAGEOFF
+    adrp x11,bodymass@PAGE
+    add x11,x11,bodymass@PAGEOFF
+    adrp x12,bodyx@PAGE
+    add x12,x12,bodyx@PAGEOFF
+    adrp x13,bodyy@PAGE
+    add x13,x13,bodyy@PAGEOFF
+    adrp x14,bodyz@PAGE
+    add x14,x14,bodyz@PAGEOFF
+    ldr x0,=0x3FE0000000000000 ; 0.5
+.L0energy:
+
+    ldr d1,[x8,x1]
+    fmul d1,d1,d1
+
+    ldr d2,[x9,x1]
+    fmul d2,d2,d2
+
+    ldr d3,[x10,x1]
+    fmul d3,d3,d3
+
+    fadd d1,d1,d2
+    fadd d1,d1,d3
+
+    ldr d2,[x11,x1]
+    fmul d1,d1,d2
+
+    fmov d2,x0
+    fmul d2,d2,d1
+
+    fadd.2d v0,v0,v2
+    subs x2,x2,1
+    beq .L2energy
+    mov x18,x2
+    mov x3,x1
+    add x3,x3,8
+.L1energy:
+    ldr x15,[x12,x1]
+    dup.2d v1,x15
+    ldr q2,[x12,x3]
+    fsub.2d v1,v1,v2
+
+    ldr x15,[x13,x1]
+    dup.2d v2,x15
+    ldr q3,[x13,x3]
+    fsub.2d v2,v2,v3
+
+    ldr x15,[x14,x1]
+    dup.2d v3,x15
+    ldr q4,[x14,x3]
+    fsub.2d v3,v3,v4
+
+    fmul.2d v1,v1,v1
+    fmul.2d v2,v2,v2
+    fmul.2d v3,v3,v3
+
+    fadd.2d v1,v1,v2
+    fadd.2d v1,v1,v3
+    fsqrt.2d v1,v1
+
+    ldr x15,[x11,x1]
+    dup.2d v2,x15
+    ldr q3,[x11,x3]
+    fmul.2d v2,v2,v3
+    fdiv.2d v2,v2,v1
+    fsub.2d v0,v0,v2
+    add x3,x3,16
+    subs x2,x2,2
+    bgt .L1energy
+    add x1,x1, 8
+    mov x2,x18
+    b .L0energy
+.L2energy:
+    dup d1,v0[0]
+    dup d2,v0[1]
+    fadd d0,d1,d2
+	ret
+print_energy:
+    sub sp,sp,16
+    str x30,[sp],-16
+    adrp x0,msg@PAGE
+    add x0,x0,msg@PAGEOFF
+    str d0,[sp]
+	bl _printf
+    ldr x30,[sp,16]!
+    add sp,sp,16
+	ret
+advance:
+; v15 holds dt
+
+    mov x2,4; x2 -> i
+    mov x4,xzr
+    mov x1,xzr
+    adrp x10,bodyx@PAGE
+    add x10,x10,bodyx@PAGEOFF
+    adrp x11,bodyy@PAGE
+    add x11,x11,bodyy@PAGEOFF
+    adrp x12,bodyz@PAGE
+    add x12,x12,bodyz@PAGEOFF
+    adrp x13,diffx@PAGE
+    add x13,x13,diffx@PAGEOFF
+    adrp x14,diffy@PAGE
+    add x14,x14,diffy@PAGEOFF
+    adrp x15,diffz@PAGE
+    add x15,x15,diffz@PAGEOFF
+    adrp x16,bodyvx@PAGE
+    add x16,x16,bodyvx@PAGEOFF
+    adrp x17,bodyvy@PAGE
+    add x17,x17,bodyvy@PAGEOFF
+    adrp x18,bodyvz@PAGE
+    add x18,x18,bodyvz@PAGEOFF
+.L0advance:
+    mov x9,x2 ; x9 -> j
+    mov x3,x1
+    add x3,x3,8
+.L1advance:
+    cmp x9,1
+    beq .F1advance
+    ldr x0,[x10,x1]
+    dup.2d v0,x0
+    ldr x0,[x11,x1]
+    dup.2d v1,x0
+    ldr x0,[x12,x1]
+    dup.2d v2,x0
+
+    ldr q3,[x10,x3]
+    ldr q4,[x11,x3]
+    ldr q5,[x12,x3]
+
+    fsub.2d v0,v0,v3 ; dx -> v0
+    fsub.2d v1,v1,v4 ; dy -> v1
+    fsub.2d v2,v2,v5 ; dz -> v2
+    str q0,[x13,x4]
+    str q1,[x14,x4]
+    str q2,[x15,x4]
+    add x4,x4,16
+    add x3,x3,16
+    subs x9,x9,2
+    b .dskip1
+
+  .F1advance:
+    ldr d0,[x10,x1]
+    ldr d1,[x11,x1]
+    ldr d2,[x12,x1]
+
+    ldr d3,[x10,x3]
+    ldr d4,[x11,x3]
+    ldr d5,[x12,x3]
+
+    fsub d0,d0,d3 ; dx -> d0
+    fsub d1,d1,d4 ; dy -> d1
+    fsub d2,d2,d5 ; dz -> d2
+    str d0,[x13,x4]
+    str d1,[x14,x4]
+    str d2,[x15,x4]
+    add x4,x4,8
+    add x3,x3,8
+    subs x9,x9,1
+
+.dskip1:
+	bgt .L1advance
+    add x1,x1,8
+    subs x2,x2,1
+	bgt .L0advance
+
+;-----------------------------------
+    mov x2,5
+    mov x5,xzr
+    adrp x4,mag@PAGE
+    add x4,x4,mag@PAGEOFF
+.L2advance:
+
+    ldr q3,[x13,x5]
+    ldr q4,[x14,x5]
+    ldr q5,[x15,x5]
+
+    mov v6.16b,v15.16b
+
+    fmul.2d v3,v3,v3
+
+    fmla.2d v3,v4,v4
+    fmla.2d v3,v5,v5
+
+;    fsqrt.2d v7,v3
+;    fmul.2d v3,v3,v7
+    fdiv.2d v6,v6,v3
+    frsqrte.2d v4,v3
+    adrp x0,L2@PAGE
+    ldr q31,[x0,L2@PAGEOFF]
+    fmul.2d v3,v3,v31
+	;--------------------
+	
+    mov v7.16b,v4.16b
+	
+    mov v8.16b,v3.16b
+    fmul.2d v8,v8,v7
+    fmul.2d v8,v8,v7
+    fmul.2d v8,v8,v7
+    
+
+    adrp x0,L1@PAGE
+    ldr q31,[x0,L1@PAGEOFF]
+    fmul.2d v7,v7,v31
+	fsub.2d v7,v7,v8
+	;------------------------
+	
+    mov v8.16b,v3.16b
+    fmul.2d v8,v8,v7
+    fmul.2d v8,v8,v7
+    fmul.2d v8,v8,v7
+    fmul.2d v7,v7,v31	
+	fsub.2d v7,v7,v8
+	;--------------------------
+	
+    fmul.2d v6,v6,v7
+	;--------------------------
+
+
+    str q6,[x4]
+    add x4,x4,16
+    add x5,x5,16
+    subs x2,x2,1
+	bgt .L2advance
+
+;-----------------------------------------------
+    mov x2,4
+    mov x9,xzr
+    mov x5,xzr
+    adrp x4,mag@PAGE
+    add x4,x4,mag@PAGEOFF
+    adrp x6,bodymass@PAGE
+    add x6,x6,bodymass@PAGEOFF
+.L3advance:
+    mov x7,x2
+    mov x8,x9
+    add x8,x8,8
+.L4advance:
+    cmp x7,1
+    beq .F3advance
+    ldr q6,[x6,x8]
+    ldr q5,[x4]
+    fmul.2d v6,v6,v5
+
+    ldr q10,[x13,x5]
+    ldr q11,[x14,x5]
+    ldr q12,[x15,x5]
+
+    ldr d3,[x16,x9]
+    ldr d4,[x17,x9]
+    ldr d5,[x18,x9]
+
+    mov v7.16b,v10.16b
+    mov v8.16b,v11.16b
+    mov v9.16b,v12.16b
+    fmul.2d v7,v7,v6
+    fmul.2d v8,v8,v6
+    fmul.2d v9,v9,v6
+    mov d16,v7[0]
+    mov d17,v7[1]
+    fadd d7,d16,d17
+    mov d16,v8[0]
+    mov d17,v8[1]
+    fadd d8,d16,d17
+    mov d16,v9[0]
+    mov d17,v9[1]
+    fadd d9,d16,d17
+    fsub d3,d3,d7
+    fsub d4,d4,d8
+    fsub d5,d5,d9
+    str d3,[x16,x9]
+    str d4,[x17,x9]
+    str d5,[x18,x9]
+	; iBody.vx -= dx * bodies[j].mass * mag;
+; ----------------------------------------------
+    ldr x0,[x6,x9]
+    dup.2d v7,x0
+    ldr q6,[x4]
+    fmul.2d v7,v7,v6
+
+    ldr q3,[x16,x8]
+    ldr q4,[x17,x8]
+    ldr q5,[x18,x8]
+
+    mov v0.16b,v10.16b
+    mov v1.16b,v11.16b
+    mov v2.16b,v12.16b
+    fmla.2d v3,v0,v7
+    fmla.2d v4,v1,v7
+    fmla.2d v5,v2,v7
+
+    str q3,[x16,x8]
+    str q4,[x17,x8]
+    str q5,[x18,x8]
+  ; bodies[j].vx += dx * iBody.mass * mag;
+    add x5,x5,16
+    add x4,x4,16
+    add x8,x8,16
+    subs x7,x7,2
+	b .mskip1
+.F3advance:
+    ldr d6,[x6,x8]
+    ldr d5,[x4]
+    fmul d6,d6,d5
+
+    ldr d10,[x13,x5]
+    ldr d11,[x14,x5]
+    ldr d12,[x15,x5]
+
+    ldr d3,[x16,x9]
+    ldr d4,[x17,x9]
+    ldr d5,[x18,x9]
+
+    fmov d7,d10
+    fmov d8,d11
+    fmov d9,d12
+    fmsub d3,d7,d6,d3
+    fmsub d4,d8,d6,d4
+    fmsub d5,d9,d6,d5
+
+    str d3,[x16,x9]
+    str d4,[x17,x9]
+    str d5,[x18,x9]
+	; iBody.vx -= dx * bodies[j].mass * mag;
+; ----------------------------------------------
+    ldr d7,[x6,x9]
+    ldr d6,[x4]
+    fmul d7,d7,d6
+
+    ldr d3,[x16,x8]
+    ldr d4,[x17,x8]
+    ldr d5,[x18,x8]
+
+    fmov d0,d10
+    fmov d1,d11
+    fmov d2,d12
+
+    fmadd d3,d0,d7,d3
+    fmadd d4,d1,d7,d4
+    fmadd d5,d2,d7,d5
+
+
+    str d3,[x16,x8]
+    str d4,[x17,x8]
+    str d5,[x18,x8]
+	; bodies[j].vx += dx * iBody.mass * mag;
+    add x5,x5,8
+    add x4,x4,8
+    add x8,x8,8
+    subs x7,x7,1 
+;-----------------------------------------
+.mskip1:
+	bgt .L4advance
+    add x9,x9,8
+    subs x2,x2,1
+	bgt .L3advance
+
+    mov x9,xzr
+    mov x2,5
+.L5advance:
+    cmp x2,1
+    bne .F2advance
+    ldr d0,[x10,x9]
+    ldr d1,[x11,x9]
+    ldr d2,[x12,x9]
+
+    dup d3,v15[0]
+    fmov d4,d3
+    fmov d5,d3
+
+    ldr d6,[x16,x9]
+    ldr d7,[x17,x9]
+    ldr d8,[x18,x9]
+
+    fmadd d0,d3,d6,d0
+    fmadd d1,d4,d7,d1
+    fmadd d2,d5,d8,d2
+
+    str d0,[x10,x9]
+    str d1,[x11,x9]
+    str d2,[x12,x9]
+
+    add x9,x9,8
+    subs x2,x2,1
+    b .kskip1
+  .F2advance:
+    ldr q0,[x10,x9]
+    ldr q1,[x11,x9]
+    ldr q2,[x12,x9]
+
+    mov v3.16b,v15.16b
+    mov v4.16b,v3.16b
+    mov v5.16b,v3.16b
+    ldr q6,[x16,x9]
+    ldr q7,[x17,x9]
+    ldr q8,[x18,x9]
+
+
+    fmla.2d v0,v3,v6
+    fmla.2d v1,v4,v7
+    fmla.2d v2,v5,v8
+    str q0,[x10,x9]
+    str q1,[x11,x9]
+    str q2,[x12,x9]
+    add x9,x9,16
+    subs x2,x2,2
+  .kskip1:
+    bgt .L5advance
+    ret 
+.data
+bmsg: .ascii "x: %.20f\ny: %.20f\nz: %.20f\n"
+      .ascii "vx: %.20f\nvy: %.20f\nvz: %.20f\n"
+      .asciz "mass: %.20f\n\n"
+.align 8
+msg: .asciz "%.9f\n"
+.align 8
+argv: .asciz "argv : %d\n"
+.align 16
+L1: .double 1.5,1.5
+L2: .double 0.5,0.5
+.bss
+.align 16
+sun: .space SIZEOFBODY
+jupiter: .space SIZEOFBODY
+saturn: .space SIZEOFBODY
+uranus: .space SIZEOFBODY
+neptune: .space SIZEOFBODY
+.align 16
+bodyx: .space 10*8
+.align 16
+bodyy: .space 10*8
+.align 16
+bodyz: .space 10*8
+.align 16
+bodyvx: .space 10*8
+.align 16
+bodyvy: .space 10*8
+.align 16
+bodyvz: .space 10*8
+.align 16
+bodymass: .space 10*8
+.align 16
+diffx: .space 10*8
+.align 16
+diffy: .space 10*8
+.align 16
+diffz: .space 10*8
+.align 16
+n: .space 8
+.align 16
+mag: .space 10*8
