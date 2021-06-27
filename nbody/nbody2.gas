@@ -484,7 +484,7 @@ _main:
     advance 08
     advance 09
     advance 10
-    subs x20,x20,10
+    subs x20,x20,20
 	bgt .L1main
     b Lskip
 lo:
