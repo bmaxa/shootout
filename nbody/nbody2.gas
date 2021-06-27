@@ -459,10 +459,7 @@ _main:
 	ldr x0,=0x3F847AE147AE147B;0.01
 	dup.2d v15,x0
 .L1main:
-    mov x0,20
-    udiv x28,x20,x0
-    msub x28,x0,x28,x20
-    cmp x21,20
+    cmp x20,20
     blt lo
 	advance A
     advance B
