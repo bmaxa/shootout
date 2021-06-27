@@ -461,7 +461,7 @@ _main:
 .L1main:
     mov x0,20
     udiv x28,x20,x0
-    msub x28,x0,x21,x28
+    msub x28,x0,x28,x20
     cmp x21,20
     blt lo
 	advance A
