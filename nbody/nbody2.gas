@@ -481,39 +481,9 @@ advance:
     fmla.2d v3,v4,v4
     fmla.2d v3,v5,v5
 
-;    fsqrt.2d v7,v3
-;    fmul.2d v3,v3,v7
+    fsqrt.2d v7,v3
+    fmul.2d v3,v3,v7
     fdiv.2d v6,v6,v3
-    frsqrte.2d v4,v3
-    adrp x0,L2@PAGE
-    ldr q31,[x0,L2@PAGEOFF]
-    fmul.2d v3,v3,v31
-	;--------------------
-	
-    mov v7.16b,v4.16b
-	
-    mov v8.16b,v3.16b
-    fmul.2d v8,v8,v7
-    fmul.2d v8,v8,v7
-    fmul.2d v8,v8,v7
-    
-
-    adrp x0,L1@PAGE
-    ldr q31,[x0,L1@PAGEOFF]
-    fmul.2d v7,v7,v31
-	fsub.2d v7,v7,v8
-	;------------------------
-	
-    mov v8.16b,v3.16b
-    fmul.2d v8,v8,v7
-    fmul.2d v8,v8,v7
-    fmul.2d v8,v8,v7
-    fmul.2d v7,v7,v31	
-	fsub.2d v7,v7,v8
-	;--------------------------
-	
-    fmul.2d v6,v6,v7
-	;--------------------------
 
 
     str q6,[x4]
