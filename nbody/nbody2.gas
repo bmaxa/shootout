@@ -318,31 +318,7 @@ Lmskip1\label:
     mov x2,5
 L5\label:
     cmp x2,1
-    bne LF2\label
-    ldr d0,[x10,x9]
-    ldr d1,[x11,x9]
-    ldr d2,[x12,x9]
-
-    dup d3,v15[0]
-    fmov d4,d3
-    fmov d5,d3
-
-    ldr d6,[x16,x9]
-    ldr d7,[x17,x9]
-    ldr d8,[x18,x9]
-
-    fmadd d0,d3,d6,d0
-    fmadd d1,d4,d7,d1
-    fmadd d2,d5,d8,d2
-
-    str d0,[x10,x9]
-    str d1,[x11,x9]
-    str d2,[x12,x9]
-
-    add x9,x9,8
-    subs x2,x2,1
-    b Lkskip1\label
-  LF2\label:
+    beq LF2\label
     ldr q0,[x10,x9]
     ldr q1,[x11,x9]
     ldr q2,[x12,x9]
@@ -363,6 +339,29 @@ L5\label:
     str q2,[x12,x9]
     add x9,x9,16
     subs x2,x2,2
+    b Lkskip1\label
+  LF2\label:
+    ldr d0,[x10,x9]
+    ldr d1,[x11,x9]
+    ldr d2,[x12,x9]
+
+    dup d3,v15[0]
+    fmov d4,d3
+    fmov d5,d3
+
+    ldr d6,[x16,x9]
+    ldr d7,[x17,x9]
+    ldr d8,[x18,x9]
+
+    fmadd d0,d3,d6,d0
+    fmadd d1,d4,d7,d1
+    fmadd d2,d5,d8,d2
+
+    str d0,[x10,x9]
+    str d1,[x11,x9]
+    str d2,[x12,x9]
+    add x9,x9,8
+    subs x2,x2,1
   Lkskip1\label:
     bgt L5\label
 .endm 
