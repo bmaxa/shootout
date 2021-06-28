@@ -215,18 +215,22 @@ L4\label:
     fmul.2d v7,v7,v6
     fmul.2d v8,v8,v6
     fmul.2d v9,v9,v6
-    mov d16,v7[0]
-    mov d17,v7[1]
-    mov d18,v8[0]
-    mov d19,v8[1]
+    mov v22.d[0],v7.d[0]
+    mov v23.d[0],v7.d[1]
+    mov v22.d[1],v8.d[0]
+    mov v23.d[1],v8.d[1]
     mov d20,v9[0]
     mov d21,v9[1]
-    fadd d7,d16,d17
-    fadd d8,d18,d19
+    fmov x23,d3
+    fmov x24,d4
+    mov v24.d[0],x23
+    mov v24.d[1],x24
+    fadd.2d v7,v22,v23
     fadd d9,d20,d21
-    fsub d3,d3,d7
-    fsub d4,d4,d8
+    fsub.2d v24,v24,v7
     fsub d5,d5,d9
+    mov d3,v24[0]
+    mov d4,v24[1]
     str d3,[x16,x9]
     str d4,[x17,x9]
     str d5,[x18,x9]
